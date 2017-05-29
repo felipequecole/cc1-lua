@@ -21,8 +21,8 @@ comando :   listavar '=' listaexp |
             'while' exp 'do' bloco 'end' |
             'repeat' bloco 'until' exp |
             'if' exp 'then' bloco ('elseif' exp 'then' bloco)* ('else' bloco)? 'end' |
-            'for' Nome '=' exp ',' exp (',' exp)? 'do' bloco 'end' |
-            'for' listadenomes 'in' listaexp 'do' bloco 'end' |
+            'for' var '=' exp ',' exp (',' exp)? 'do' bloco 'end' |
+            'for' listavar 'in' listaexp 'do' bloco 'end' |
             'function' nomedafuncao corpodafuncao |
             'local function' nomedafuncao corpodafuncao |
             'local' listadenomes ('=' listaexp)?;
@@ -36,6 +36,9 @@ var :   Nome {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);}|
         Nome ('[' exp ']')+ {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);}|
         NomeAtributo {TabelaDeSimbolos.adicionarSimbolo($NomeAtributo.text, Tipo.VARIAVEL);};
 
+// regra utilizada para salvar na tabela de simbolos
+nome: Nome {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);};
+
 expprefixo :    var |
                 callfuncao |
                 '(' exp ')';
@@ -43,7 +46,7 @@ expprefixo :    var |
 chamadadefuncao :   (args)+ |
                     (':' args)+;
 
-listadenomes : Nome (',' Nome)*;
+listadenomes : nome (',' nome)*;
 
 listaexp : (exp ',')* exp;
 
