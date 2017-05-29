@@ -25,7 +25,7 @@ comando :   listavar '=' listaexp |
             'local' listadenomes ('=' listaexp)?;
 
 ultimocomando : 'return' (listaexp)? | 'break';
-nomedafuncao : Nome ('.' Nome)* (':' Nome)?;
+nomedafuncao : Nome ('.' Nome)* (':' Nome)? {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.FUNCAO);};
 listavar : var (',' var)*;
 
 var :   Nome |
@@ -43,7 +43,7 @@ listadenomes : Nome (',' Nome)*;
 
 listaexp : (exp ',')* exp;
 
-exp : 'nil' | 'false' | 'true' | Numero | Cadeia | '...' | callfuncao |
+exp : 'nil' | 'false' | 'true' | Numero | Cadeia | '...' |
 expprefixo | construtortabela | exp opbin exp | opunaria exp;
 
 // regra para chamadas de funcao
