@@ -10,7 +10,7 @@ Numero: [0-9][0-9]* ('.' [0-9]+)?;
 Cadeia:  '"' ~('\n' | '\r' | '"')* '"' |  '\'' ~('\n' | '\r' | '\'')* '\'';
 WS : [ \t\r\n]+ -> skip;
 Comentario: '--' ~('\n')* '\n' -> skip;
-//NomeAtributo: Nome ('.' Nome)+;
+NomeAtributo: Nome ('.' Nome)+;
 
 programa : trecho;
 trecho : (comando (';')?)* (ultimocomando (';')?)?;
@@ -28,12 +28,13 @@ comando :   listavar '=' listaexp |
             'local' listadenomes ('=' listaexp)?;
 
 ultimocomando : 'return' (listaexp)? | 'break';
-nomedafuncao : Nome {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.FUNCAO);};
+nomedafuncao : Nome {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.FUNCAO);} |
+                NomeAtributo {TabelaDeSimbolos.adicionarSimbolo($NomeAtributo.text, Tipo.FUNCAO);};
 listavar : var (',' var)*;
 
 var :   Nome {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);}|
         Nome ('[' exp ']')+ {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);}|
-        Nome ('.' Nome)+ {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);};
+        NomeAtributo {TabelaDeSimbolos.adicionarSimbolo($NomeAtributo.text, Tipo.VARIAVEL);};
 
 expprefixo :    var |
                 callfuncao |
