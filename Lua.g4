@@ -4,11 +4,14 @@
  */
 
 grammar Lua;
+//Nomeatributo: [a-zA-Z] [a-zA-Z0-9_]* ('.' [a-zA-Z] [a-zA-Z0-9_]*)*;
 Nome : [a-zA-Z] [a-zA-Z0-9_]* ;
 Numero: [0-9][0-9]* ('.' [0-9]+)?;
 Cadeia:  '"' ~('\n' | '\r' | '"')* '"' |  '\'' ~('\n' | '\r' | '\'')* '\'';
 WS : [ \t\r\n]+ -> skip;
 Comentario: '--' ~('\n')* '\n' -> skip;
+//NomeAtributo: Nome ('.' Nome)+;
+
 programa : trecho;
 trecho : (comando (';')?)* (ultimocomando (';')?)?;
 bloco : trecho;
@@ -20,24 +23,24 @@ comando :   listavar '=' listaexp |
             'if' exp 'then' bloco ('elseif' exp 'then' bloco)* ('else' bloco)? 'end' |
             'for' Nome '=' exp ',' exp (',' exp)? 'do' bloco 'end' |
             'for' listadenomes 'in' listaexp 'do' bloco 'end' |
-            'function' Nome corpodafuncao |
-            'local function' Nome corpodafuncao |
+            'function' nomedafuncao corpodafuncao |
+            'local function' nomedafuncao corpodafuncao |
             'local' listadenomes ('=' listaexp)?;
 
 ultimocomando : 'return' (listaexp)? | 'break';
-nomedafuncao : Nome ('.' Nome)* (':' Nome)? {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.FUNCAO);};
+nomedafuncao : Nome {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.FUNCAO);};
 listavar : var (',' var)*;
 
-var :   Nome |
-        Nome ('[' exp ']')+ |
-        Nome ('.' Nome)+;
+var :   Nome {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);}|
+        Nome ('[' exp ']')+ {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);}|
+        Nome ('.' Nome)+ {TabelaDeSimbolos.adicionarSimbolo($Nome.text, Tipo.VARIAVEL);};
 
 expprefixo :    var |
                 callfuncao |
                 '(' exp ')';
 
 chamadadefuncao :   (args)+ |
-                    (':' Nome args)+;
+                    (':' args)+;
 
 listadenomes : Nome (',' Nome)*;
 
